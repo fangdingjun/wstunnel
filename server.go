@@ -72,7 +72,7 @@ func forwardWS2TCP(conn1 *websocket.Conn, conn2 net.Conn) {
 
 		for {
 			n, err := conn2.Read(buf)
-			if err != nil {
+			if err != nil && err != io.EOF {
 				log.Errorln(err)
 				break
 			}

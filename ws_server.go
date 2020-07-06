@@ -46,6 +46,8 @@ func (wss *wsServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Debugf("request %s, forward to %s", p, remote)
+
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Errorln(err)
