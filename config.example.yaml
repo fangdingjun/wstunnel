@@ -1,0 +1,9 @@
+
+
+proxy_config:
+    - listen: ws://127.0.0.1:2901/p1
+      remote: tcp://127.0.0.1:2903
+    - listen: ws://127.0.0.1:2901/p2
+      remote: tcp://127.0.0.1:2904
+    - listen: tcp://127.0.0.1:2905
+      remote: ws://127.0.0.1:2901/p1
