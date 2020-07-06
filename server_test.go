@@ -62,6 +62,8 @@ func _sendAndRecvTCP(addr string, msg string) string {
 		return ""
 	}
 
+	defer c.Close()
+
 	_, err = c.Write([]byte(msg))
 	if err != nil {
 		log.Errorln(err)
@@ -83,14 +85,21 @@ func _sendAndRecvWS(addr string, msg string) string {
 		log.Errorln(err)
 		return ""
 	}
+	resp.Body.Close()
+
 	if resp.StatusCode != http.StatusSwitchingProtocols {
 		log.Errorf("dial ws code %d", resp.StatusCode)
+		return ""
 	}
+
+	defer c1.Close()
+
 	err = c1.WriteMessage(websocket.BinaryMessage, []byte(msg))
 	if err != nil {
 		log.Errorln(err)
 		return ""
 	}
+
 	_, d, err := c1.ReadMessage()
 	if err != nil {
 		log.Errorln(err)
