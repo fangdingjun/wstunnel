@@ -21,8 +21,8 @@ func makeServers(cfg conf) {
 		if err != nil {
 			log.Fatalf("parse %s, error %s", c.Listen, err)
 		}
-		switch u.Scheme {
 
+		switch u.Scheme {
 		case "ws":
 			exists := false
 			for i := 0; i < len(wsservers); i++ {
@@ -35,7 +35,6 @@ func makeServers(cfg conf) {
 			if !exists {
 				wsservers = append(wsservers, wsServer{u.Host, []forwardRule{{u.Path, c.Remote}}})
 			}
-
 		case "tcp":
 			tcpservers = append(tcpservers, tcpServer{u.Host, c.Remote})
 		default:
@@ -46,6 +45,7 @@ func makeServers(cfg conf) {
 	for _, srv := range wsservers {
 		go srv.run()
 	}
+
 	for _, srv := range tcpservers {
 		go srv.run()
 	}
@@ -64,6 +64,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	var cfg conf
 	if err := yaml.Unmarshal(data, &cfg); err != nil {
 		log.Fatal(err)
