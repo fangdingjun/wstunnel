@@ -32,3 +32,12 @@ start client side proxy by `wstunnel -c client.yaml`
 now, you can connect to ssh server by `ssh -p 9001 127.0.0.1`, your ssh connection hide in websocket
 
 the websocket can be proxied by nginx also
+
+
+### Support me ###
+
+If you find my work useful, you consider support me for further develop.
+
+Paypal:   [Support me on paypal.com](https://www.paypal.me/DingjunFang)
+
+BTC: 3DSr6qNrrH4dQ3aTBhtkyYt94batcehmRf
