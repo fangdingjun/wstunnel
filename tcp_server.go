@@ -38,6 +38,10 @@ func (srv *tcpServer) serve(c net.Conn) {
 
 	log.Debugf("connected from %s, forward to %s", c.RemoteAddr(), srv.remote)
 
+	defer func() {
+		log.Debugf("from %s, finished", c.RemoteAddr())
+	}()
+
 	if u.Scheme == "ws" || u.Scheme == "wss" {
 		conn1, resp, err := dialer.Dial(srv.remote, nil)
 		if err != nil {

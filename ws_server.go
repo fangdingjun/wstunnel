@@ -46,7 +46,18 @@ func (wss *wsServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Debugf("request %s, forward to %s", p, remote)
+	ip := r.RemoteAddr
+
+	_ip := r.Header.Get("x-real-ip")
+	if _ip != "" {
+		ip = _ip
+	}
+
+	log.Debugf("from %s, request %s, forward to %s", ip, p, remote)
+
+	defer func() {
+		log.Debugf("from %s, request finished", ip)
+	}()
 
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {

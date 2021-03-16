@@ -50,6 +50,10 @@ func forwardWS2WS(conn1, conn2 *websocket.Conn) {
 func forwardWS2TCP(conn1 *websocket.Conn, conn2 net.Conn) {
 	ch := make(chan struct{}, 2)
 
+	defer func() {
+		log.Debugf("forward to %s finished", conn2.RemoteAddr())
+	}()
+
 	go func() {
 		for {
 			_, data, err := conn1.ReadMessage()
