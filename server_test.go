@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -12,6 +13,38 @@ import (
 	"github.com/gorilla/websocket"
 	"gopkg.in/yaml.v2"
 )
+
+type testWSHandler struct{}
+
+func (ts *testWSHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Errorln(err)
+		http.Error(w, "", http.StatusBadRequest)
+		return
+	}
+
+	defer conn.Close()
+
+	for {
+		typ, data, err := conn.ReadMessage()
+		if err != nil {
+			if !websocket.IsCloseError(err, 1006) {
+				log.Errorln(err)
+			}
+			return
+		}
+		conn.WriteMessage(typ, data)
+	}
+
+}
+
+func echoServerWS(addr string) {
+	srv := &http.Server{Addr: addr, Handler: &testWSHandler{}}
+	if err := srv.ListenAndServe(); err != nil {
+		log.Errorln(err)
+	}
+}
 
 func echoServer(addr string) {
 	l1, err := net.Listen("tcp", addr)
@@ -33,7 +66,9 @@ func echoServer(addr string) {
 			for {
 				n, err := c.Read(data)
 				if err != nil {
-					log.Errorln(err)
+					if err != io.EOF {
+						log.Errorln(err)
+					}
 					break
 				}
 				c.Write(data[:n])
@@ -126,6 +161,8 @@ func TestServer(t *testing.T) {
 
 	go echoServer("127.0.0.1:2903")
 	go echoServer("127.0.0.1:2904")
+	go echoServerWS("127.0.0.1:2907")
+	go echoServerWS("127.0.0.1:2908")
 
 	time.Sleep(time.Second)
 
@@ -134,8 +171,9 @@ func TestServer(t *testing.T) {
 		msg  string
 	}{
 		{"ws://127.0.0.1:2901/p1", "p1"},
-		{"ws://127.0.0.1:2901/p2", "p2"},
+		{"ws://127.0.0.1:2902/p2", "p2"},
 		{"tcp://127.0.0.1:2905", "c3"},
+		{"tcp://127.0.0.1:2906", "c4"},
 	}
 	for _, tt := range testdata {
 		_m := sendAndRecv(tt.addr, tt.msg)
