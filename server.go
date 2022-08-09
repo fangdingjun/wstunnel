@@ -118,8 +118,8 @@ func forwardTCP2TCP(c1, c2 net.Conn) {
 }
 
 func makeServers(cfg conf) {
-	var wsservers = []wsServer{}
-	var tcpservers = []tcpServer{}
+	var wsservers = []*wsServer{}
+	var tcpservers = []*tcpServer{}
 
 	for _, c := range cfg.ProxyConfig {
 		u, err := url.Parse(c.Listen)
@@ -138,10 +138,10 @@ func makeServers(cfg conf) {
 				}
 			}
 			if !exists {
-				wsservers = append(wsservers, wsServer{u.Host, []forwardRule{{u.Path, c.Remote}}})
+				wsservers = append(wsservers, &wsServer{u.Host, []forwardRule{{u.Path, c.Remote}}})
 			}
 		case "tcp":
-			tcpservers = append(tcpservers, tcpServer{u.Host, c.Remote})
+			tcpservers = append(tcpservers, &tcpServer{u.Host, c.Remote})
 		default:
 			log.Fatalf("unsupported scheme %s", u.Scheme)
 		}
